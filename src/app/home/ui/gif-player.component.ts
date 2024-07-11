@@ -1,4 +1,6 @@
+import { JsonPipe } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   computed,
   ElementRef,
@@ -18,7 +20,7 @@ interface GifPlayerState {
 @Component({
   selector: 'app-gif-player',
   standalone: true,
-  imports: [MatProgressSpinnerModule],
+  imports: [MatProgressSpinnerModule, JsonPipe],
   template: `
     @if (status() === 'loading') {
     <mat-progress-spinner mode="indeterminate" diameter="50" />
@@ -69,7 +71,7 @@ interface GifPlayerState {
       }
   `,
 })
-export class GifPlayerComponent {
+export class GifPlayerComponent implements AfterViewInit {
   src = input.required<string>();
   thumbnail = input.required<string>();
 
@@ -97,6 +99,21 @@ export class GifPlayerComponent {
     switchMap(({ nativeElement }) => fromEvent(nativeElement, 'loadeddata'))
   );
 
+  ngAfterViewInit() {
+    // effects
+    const video = this.videoElement().nativeElement;
+
+    const playing = this.playing();
+    const status = this.status();
+    if (!video) return;
+    if (!playing && status === 'initial') {
+      video.load();
+    }
+    if (status === 'loaded') {
+      playing ? video.play() : video.pause();
+    }
+  }
+
   constructor() {
     // reducers
     this.videoLoadStart$
@@ -104,30 +121,15 @@ export class GifPlayerComponent {
       .subscribe(() =>
         this.state.update((state) => ({ ...state, status: 'loading' }))
       );
-    this.videoLoadComplete$
-      .pipe(takeUntilDestroyed())
-      .subscribe(() =>
-        this.state.update((state) => ({ ...state, status: 'loaded' }))
-      );
+    this.videoLoadComplete$.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.state.update((state) => ({ ...state, status: 'loaded' }));
+      const video = this.videoElement().nativeElement;
+      video.play();
+    });
     this.togglePlay$
       .pipe(takeUntilDestroyed())
       .subscribe(() =>
         this.state.update((state) => ({ ...state, playing: !state.playing }))
       );
-
-    // effects
-    const { nativeElement: video } = this.videoElement();
-    const playing = this.playing();
-    const status = this.status();
-
-    if (!video) return;
-
-    if (playing && status === 'initial') {
-      video.load();
-    }
-
-    if (status === 'loaded') {
-      playing ? video.play() : video.pause();
-    }
   }
 }

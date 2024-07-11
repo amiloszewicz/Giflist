@@ -1,3 +1,4 @@
+import { JsonPipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { Gif } from '../../shared/interfaces';
 import { GifPlayerComponent } from './gif-player.component';
@@ -16,7 +17,7 @@ import { GifPlayerComponent } from './gif-player.component';
     }
   `,
   styles: ``,
-  imports: [GifPlayerComponent],
+  imports: [GifPlayerComponent, JsonPipe],
 })
 export class GifListComponent {
   gifs = input.required<Gif[]>();
