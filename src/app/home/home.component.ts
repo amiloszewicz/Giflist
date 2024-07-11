@@ -5,7 +5,7 @@ import { GifListComponent } from './ui/gif-list.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  template: `<app-gif-list
+  template: ` <app-gif-list
     [gifs]="redditService.gifs()"
     class="grid-container"
   />`,
