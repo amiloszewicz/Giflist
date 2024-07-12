@@ -24,17 +24,6 @@ export class RedditService {
 
   // sources
   private gifsLoaded$ = this.fetchFromReddit('gifs');
-  // gifsLoaded$ = of([
-  //   {
-  //     src: 'img-9gag-fun.9cache.com/photo/a9y7BMj_460svav1.mp4',
-  //     author: 'adam',
-  //     name: '',
-  //     permalink: '',
-  //     title: 'test gif',
-  //     thumbnail: '',
-  //     comments: 0,
-  //   },
-  // ]);
 
   constructor() {
     // reducers
