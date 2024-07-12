@@ -8,7 +8,8 @@ import { SearchBarComponent } from './ui/search-bar.component';
 @Component({
   selector: 'app-home',
   standalone: true,
-  template: ` <h1>Giflist</h1>
+  template: `
+    <h1>Giflist</h1>
     <app-search-bar
       [subredditFormControl]="redditService.subredditFormControl"
     ></app-search-bar>
@@ -25,7 +26,8 @@ import { SearchBarComponent } from './ui/search-bar.component';
         onScroll(); redditService.pagination$.next(redditService.lastKnowGif())
       "
       class="grid-container"
-    />}`,
+    />}
+  `,
   imports: [
     GifListComponent,
     InfiniteScrollModule,
