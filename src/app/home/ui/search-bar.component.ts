@@ -28,13 +28,15 @@ import { MatToolbarModule } from '@angular/material/toolbar';
   </mat-toolbar>`,
   styles: `
   mat-toolbar {
-        height: 80px;
-      }
-
-      mat-form-field {
-        width: 100%;
-        padding-top: 20px;
-      }`,
+    height: 80px;
+  }
+  mat-form-field {
+    width: 100%;
+    padding-top: 20px;
+  }
+  mat-icon {
+    padding: 1rem;
+  }`,
 })
 export class SearchBarComponent {
   subredditFormControl = input.required<FormControl>();
