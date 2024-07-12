@@ -1,11 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, EMPTY, map } from 'rxjs';
+import { catchError, concatMap, EMPTY, map, startWith, Subject } from 'rxjs';
 import { Gif, RedditPost, RedditResponse } from '../interfaces';
 
 export interface GifsState {
   gifs: Gif[];
+  error: string | null;
+  loading: boolean;
+  lastKnowGif: string | null;
 }
 
 @Injectable({
@@ -17,32 +20,60 @@ export class RedditService {
   // state
   private state = signal<GifsState>({
     gifs: [],
+    error: null,
+    loading: true,
+    lastKnowGif: null,
   });
 
   // selectors
   gifs = computed(() => this.state().gifs);
+  error = computed(() => this.state().error);
+  loading = computed(() => this.state().loading);
+  lastKnowGif = computed(() => this.state().lastKnowGif);
 
   // sources
-  private gifsLoaded$ = this.fetchFromReddit('gifs');
+  pagination$ = new Subject<string | null>();
+  private gifsLoaded$ = this.pagination$.pipe(
+    startWith(null),
+    concatMap((lastKnowGif) => this.fetchFromReddit('gifs', lastKnowGif, 5))
+  );
 
   constructor() {
     // reducers
-    this.gifsLoaded$.pipe(takeUntilDestroyed()).subscribe((gifs) =>
+    this.gifsLoaded$.pipe(takeUntilDestroyed()).subscribe((response) =>
       this.state.update((state) => ({
         ...state,
-        gifs: [...state.gifs, ...gifs],
+        gifs: [...state.gifs, ...response.gifs],
+        loading: false,
+        lastKnowGif: response.lastKnowGif,
       }))
     );
   }
 
-  private fetchFromReddit(subreddit: string) {
+  private fetchFromReddit(
+    subreddit: string,
+    after: string | null,
+    gifsRequired: number
+  ) {
     return this.http
       .get<RedditResponse>(
-        `https://www.reddit.com/r/${subreddit}/hot/.json?limit=4`
+        `https://www.reddit.com/r/${subreddit}/hot/.json?limit=6` +
+          (after ? `&after=${after}` : '')
       )
       .pipe(
         catchError((err) => EMPTY),
-        map((response) => this.convertRedditPostsToGifs(response.data.children))
+        map((response) => {
+          const posts = response.data.children;
+          const lastKnowGif = posts.length
+            ? posts[posts.length - 1].data.name
+            : null;
+
+          return {
+            gifs: this.convertRedditPostsToGifs(posts),
+            gifsRequired,
+            lastKnowGif,
+          };
+        })
       );
   }
 
