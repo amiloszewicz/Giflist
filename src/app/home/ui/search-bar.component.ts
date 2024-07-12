@@ -27,7 +27,14 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     <mat-icon matSuffix>search</mat-icon>
   </mat-toolbar>`,
   styles: `
-  `,
+  mat-toolbar {
+        height: 80px;
+      }
+
+      mat-form-field {
+        width: 100%;
+        padding-top: 20px;
+      }`,
 })
 export class SearchBarComponent {
   subredditFormControl = input.required<FormControl>();
