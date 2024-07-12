@@ -8,6 +8,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   EMPTY,
+  expand,
   map,
   startWith,
   Subject,
@@ -58,7 +59,26 @@ export class RedditService {
       this.pagination$.pipe(
         startWith(null),
         concatMap((lastKnowGif) =>
-          this.fetchFromReddit(subreddit, lastKnowGif, 9)
+          this.fetchFromReddit(subreddit, lastKnowGif, 9).pipe(
+            expand((response, index) => {
+              const { gifs, gifsRequired, lastKnowGif } = response;
+              const remainingGifsToFetch = gifsRequired - gifs.length;
+              const maxAttempts = 15;
+
+              const shouldKeepTrying =
+                remainingGifsToFetch > 0 &&
+                index < maxAttempts &&
+                lastKnowGif !== null;
+
+              return shouldKeepTrying
+                ? this.fetchFromReddit(
+                    subreddit,
+                    lastKnowGif,
+                    remainingGifsToFetch
+                  )
+                : EMPTY;
+            })
+          )
         )
       )
     )
