@@ -39,8 +39,11 @@ import { GifPlayerComponent } from './gif-player.component';
   `,
   styles: `
   div {
-    padding-bottom: 2rem;
-    background: var(--mat-toolbar-container-background-color);
+    margin: 1rem;
+    filter: drop-shadow(0px 0px 6px #0e0c1ba8);
+  }
+  mat-toolbar {
+    white-space: break-spaces;
   }
   .toolbar-spacer {
     flex: 1 1 auto;
