@@ -2,11 +2,15 @@ import { Component, inject } from '@angular/core';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { RedditService } from '../shared/data-access/reddit.service';
 import { GifListComponent } from './ui/gif-list.component';
+import { SearchBarComponent } from './ui/search-bar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   template: ` <h1>Giflist</h1>
+    <app-search-bar
+      [subredditFormControl]="redditService.subredditFormControl"
+    ></app-search-bar>
     <app-gif-list
       [gifs]="redditService.gifs()"
       infiniteScroll
@@ -15,7 +19,7 @@ import { GifListComponent } from './ui/gif-list.component';
       "
       class="grid-container"
     />`,
-  imports: [GifListComponent, InfiniteScrollModule],
+  imports: [GifListComponent, InfiniteScrollModule, SearchBarComponent],
   styles: ``,
 })
 export default class HomeComponent {
