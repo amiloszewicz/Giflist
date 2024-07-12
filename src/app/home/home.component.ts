@@ -34,7 +34,12 @@ import { SearchBarComponent } from './ui/search-bar.component';
     SearchBarComponent,
     MatProgressSpinnerModule,
   ],
-  styles: ``,
+  styles: `
+  h1 {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem;
+  }`,
 })
 export default class HomeComponent {
   redditService = inject(RedditService);
